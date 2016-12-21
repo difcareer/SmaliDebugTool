@@ -9,5 +9,6 @@
 3. 文件合并
 
 #使用方式
-1. 配置好smaliidea插件，参见：
-2. java -jar SmaliDebugTool.jar path/of/apk path/of/output
+1. 进入bin目录
+1. 配置好smaliidea插件，参见：[smalidea](https://github.com/JesusFreke/smali/wiki/smalidea)
+3. ```java -jar SmaliDebugTool.jar path/of/apk path/of/output```
