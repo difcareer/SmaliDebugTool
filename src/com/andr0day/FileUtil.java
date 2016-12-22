@@ -69,7 +69,7 @@ public class FileUtil {
         return file.getAbsolutePath();
     }
 
-    public static void compareAndCopy(File src, File dst) throws Exception {
+    public static void compareAndCopy(File src, File dst, String dex) throws Exception {
         if (src.isDirectory()) {
             File[] sub = src.listFiles();
             if (sub == null) {
@@ -82,27 +82,27 @@ public class FileUtil {
                         d.mkdirs();
                     }
                 }
-                compareAndCopy(it, d);
+                compareAndCopy(it, d, dex);
             }
         } else {
-            if (!dst.exists()) {
-                copyFile(src, dst);
-                return;
+            //如果存在同一个文件来自不同的dex，内容会被合并在同一个文件中
+            if (dst.exists()) {
+                System.out.println("\n same name file from diff dex," + dst.getAbsolutePath());
             }
-            long srcLen = src.length();
-            long dstLen = dst.length();
-            //简单粗暴的处理
-            if (srcLen > dstLen) {
-                copyFile(src, dst);
-            }
+            copyFile(src, dst, dex);
         }
     }
 
-    private static void copyFile(File src, File dst) throws Exception {
+    private static void copyFile(File src, File dst, String dex) throws Exception {
         FileInputStream fis = new FileInputStream(src);
-        FileOutputStream fos = new FileOutputStream(dst);
+        FileOutputStream fos = new FileOutputStream(dst, true);
         copyStream(fis, fos);
+        if (dex != null) {
+            String tail = "\n# from : " + dex + "\n\n\n";
+            fos.write(tail.getBytes());
+        }
         fis.close();
         fos.close();
     }
+
 }

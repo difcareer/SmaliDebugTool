@@ -1,11 +1,14 @@
 package com.andr0day;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Main {
 
     private static ConcurrentHashMap<Runnable, Boolean> runnables = new ConcurrentHashMap<>();
+    private static Map<String, String> dexMap = new HashMap<>();
 
     public static void main(String[] args) {
         if (args.length != 2) {
@@ -13,7 +16,7 @@ public class Main {
             System.exit(0);
         }
         String absApk = FileUtil.getAbsPath(args[0]);
-        final String absOutput = FileUtil.getAbsPath(args[1]);
+        String absOutput = FileUtil.getAbsPath(args[1]);
         if (!new File(absApk).exists()) {
             System.out.println("apk not exist,path:" + absApk);
             System.exit(0);
@@ -43,8 +46,8 @@ public class Main {
             String fileName = it.getName();
             if (fileName.endsWith(FileUtil.DEX)) {
                 String prefix = fileName.replace(FileUtil.DEX, "");
-                final String output = absOutput + "/" + prefix;
-
+                final String output = absOutput + File.separator + prefix;
+                dexMap.put(output, fileName);
                 final Runnable runnable = new Runnable() {
                     @Override
                     public void run() {
@@ -70,31 +73,31 @@ public class Main {
         final File targetOut = new File(absOutput, FileUtil.TARGET_SUB);
 
         runnables.clear();
-        Runnable mergeRunnable = new Runnable() {
-            @Override
-            public void run() {
-                File[] subOut = new File(absOutput).listFiles();
-                if (subOut != null) {
-                    for (File it : subOut) {
-                        if (it.getName().equals(FileUtil.TARGET_SUB)) {
-                            continue;
-                        }
+
+        System.out.print("merge dir ...");
+        File[] subOut = new File(absOutput).listFiles();
+        if (subOut != null) {
+            for (final File it : subOut) {
+                if (it.getName().equals(FileUtil.TARGET_SUB)) {
+                    continue;
+                }
+                Runnable mergeRunnable = new Runnable() {
+                    @Override
+                    public void run() {
                         try {
-                            FileUtil.compareAndCopy(it, targetOut);
+                            FileUtil.compareAndCopy(it, targetOut, dexMap.get(it.getAbsolutePath()));
                             FileUtil.delete(it.getAbsolutePath());
                         } catch (Exception e) {
                             System.out.println("merge file error" + e.getMessage());
                             System.exit(0);
                         }
+                        runnables.remove(this);
                     }
-                }
-                runnables.remove(this);
+                };
+                runnables.put(mergeRunnable, true);
+                new Thread(mergeRunnable).start();
             }
-        };
-        runnables.put(mergeRunnable, true);
-        new Thread(mergeRunnable).start();
-
-        System.out.print("merge dir ...");
+        }
         loop();
         System.out.println("\nmerge dir done");
         FileUtil.delete(tmpDir);
