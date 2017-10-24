@@ -1,8 +1,8 @@
 package com.andr0day;
 
 public class ProcessUtil {
-    private static final String BAK_SMALI = "baksmali-2.0.3.jar";
-    private static final String APK_TOOL = "apktool_2.1.1.jar";
+    private static final String BAK_SMALI = "baksmali.jar";
+    private static final String APK_TOOL = "apktool.jar";
 
 
     public static Process execute(String cmd) throws Exception {
@@ -10,7 +10,7 @@ public class ProcessUtil {
     }
 
     public static Process bakSmaliDex(String dexPath, String outputPath) throws Exception {
-        return execute("java -jar " + BAK_SMALI + " " + dexPath + " -o " + outputPath);
+        return execute("java -jar " + BAK_SMALI + " disassemble " + dexPath + " -o " + outputPath);
     }
 
     public static Process apkToolApk(String apkPath, String outputPath) throws Exception {

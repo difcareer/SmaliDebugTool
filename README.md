@@ -20,3 +20,10 @@
 #Jre版本
 
 本项目使用了jdk7里面的一些语法糖，故再次编译，或者直接使用时，jre版本至少为1.7
+
+#更新baksmali.jar apktool.jar
+
+从下面的链接获取最新的jar,替换根目录和bin目录下的baksmali.jar和apktool.jar,注意名称中🈚️无版本信息
+
+apktool https://ibotpeaches.github.io/Apktool/
+baksmali https://github.com/JesusFreke/smali
