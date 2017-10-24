@@ -7,7 +7,8 @@ import java.util.zip.ZipInputStream;
 public class FileUtil {
     public static final String TARGET_SUB = "src";
     public static final String DEX = ".dex";
-    public static final String TMP_SUB = "smalidebugtool";
+    public static final String TMP_DEX = "SmaliDebugTool-dex";
+    public static final String TMP_APK = "SmaliDebugTool-apk";
 
     public static String getAbsPath(String path) {
         File file = new File(path);
@@ -39,7 +40,7 @@ public class FileUtil {
         bis.close();
     }
 
-    private static void copyStream(InputStream is, OutputStream os) throws Exception {
+    public static void copyStream(InputStream is, OutputStream os) throws Exception {
         byte[] buffer = new byte[1024];
         int read;
         while ((read = is.read(buffer)) != -1) {
@@ -63,10 +64,46 @@ public class FileUtil {
         file.delete();
     }
 
-    public static String getTmpDir() {
+    public static String getTmpDexDir() {
         String tmpDir = System.getProperty("java.io.tmpdir");
-        File file = new File(tmpDir, TMP_SUB);
+        File file = new File(tmpDir, TMP_DEX);
         return file.getAbsolutePath();
+    }
+
+    public static String getTmpApkDir() {
+        String tmpDir = System.getProperty("java.io.tmpdir");
+        File file = new File(tmpDir, TMP_APK);
+        return file.getAbsolutePath();
+    }
+
+    public static void copyDir(File src, File dst) throws Exception {
+        if (src.isDirectory()) {
+            File[] sub = src.listFiles();
+            if (sub == null) {
+                return;
+            }
+            for (File it : sub) {
+                File d = new File(dst, it.getName());
+                boolean ignore = false;
+
+                if (it.isDirectory()) {
+                    String name = it.getName();
+                    if (name.startsWith("smali")) {
+                        ignore = true;
+                    }
+                    if (!ignore) {
+                        if (!d.exists()) {
+                            d.mkdirs();
+                        }
+                    }
+                }
+                if (!ignore) {
+                    copyDir(it, d);
+                }
+            }
+        } else {
+            copyFile(src, dst, null);
+        }
     }
 
     public static void compareAndCopy(File src, File dst, String dex) throws Exception {
