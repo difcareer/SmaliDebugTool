@@ -16,3 +16,6 @@
 1. 进入bin目录
 1. 配置好smaliidea插件，参见：[smalidea](https://github.com/JesusFreke/smali/wiki/smalidea)
 3. ```java -jar SmaliDebugTool.jar path/of/apk path/of/output```
+
+#Jre版本
+本项目使用了jdk7里面的一些语法糖，故再次编译，或者直接使用时，jre版本至少为1.7
