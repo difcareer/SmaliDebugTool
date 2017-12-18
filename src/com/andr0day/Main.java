@@ -141,24 +141,23 @@ public class Main {
         File[] subOut = new File(absOutput).listFiles();
         if (subOut != null) {
             for (final File it : subOut) {
-                if (it.getName().equals(FileUtil.TARGET_SUB)) {
-                    continue;
-                }
-                Runnable mergeRunnable = new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            FileUtil.compareAndCopy(it, targetOut, dexMap.get(it.getAbsolutePath()));
-                            FileUtil.delete(it.getAbsolutePath());
-                        } catch (Exception e) {
-                            System.out.println("merge file error" + e.getMessage());
-                            System.exit(0);
+                if (it.isDirectory() && it.getName().startsWith(FileUtil.DEX_OUT_PREF)) {
+                    Runnable mergeRunnable = new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                FileUtil.compareAndCopy(it, targetOut, dexMap.get(it.getAbsolutePath()));
+                                FileUtil.delete(it.getAbsolutePath());
+                            } catch (Exception e) {
+                                System.out.println("merge file error" + e.getMessage());
+                                System.exit(0);
+                            }
+                            runnables.remove(this);
                         }
-                        runnables.remove(this);
-                    }
-                };
-                runnables.put(mergeRunnable, true);
-                new Thread(mergeRunnable).start();
+                    };
+                    runnables.put(mergeRunnable, true);
+                    new Thread(mergeRunnable).start();
+                }
             }
         }
         loop(runnables);

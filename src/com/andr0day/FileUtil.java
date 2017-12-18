@@ -7,6 +7,7 @@ import java.util.zip.ZipInputStream;
 public class FileUtil {
     public static final String TARGET_SUB = "src";
     public static final String DEX = ".dex";
+    public static final String DEX_OUT_PREF = "classes";
     public static final String TMP_DEX = "SmaliDebugTool-dex";
     public static final String TMP_APK = "SmaliDebugTool-apk";
 
